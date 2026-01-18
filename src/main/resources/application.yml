@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: Bazario
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
