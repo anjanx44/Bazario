@@ -1,6 +1,6 @@
 spring:
   application:
-    name: Bazario
+    name: ${SPRING_APPLICATION_NAME:Bazario}
 
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}

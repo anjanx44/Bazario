@@ -16,10 +16,10 @@ public class HealthCheckService {
 
     private final DataSource dataSource;
 
-    @Value("${spring.profiles.active:default}")
+    @Value("${spring.profiles.active}")
     private String activeProfile;
 
-    @Value("${spring.application.name:Bazario}")
+    @Value("${spring.application.name}")
     private String applicationName;
 
     public HealthCheckResponse performHealthCheck() {
