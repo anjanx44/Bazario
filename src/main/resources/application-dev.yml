@@ -17,3 +17,9 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+api:
+  info:
+    title: Bazario API
+    description: E-commerce platform API documentation (Development Environment)
+    version: 1.0.0-DEV
