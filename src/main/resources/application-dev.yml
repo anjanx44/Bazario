@@ -11,12 +11,22 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: ${DB_DDL_AUTO:update}
+      ddl-auto: none
     show-sql: ${DB_SHOW_SQL:true}
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: ${FLYWAY_ENABLED}
+    baseline-on-migrate: ${FLYWAY_BASELINE_ON_MIGRATE}
+    clean-disabled: ${FLYWAY_CLEAN_DISABLED}
+    locations: classpath:db/migration
+    schemas: ${FLYWAY_SCHEMAS}
+    baseline-version: 0
+    validate-on-migrate: ${FLYWAY_VALIDATE_ON_MIGRATE}
+    out-of-order: ${FLYWAY_OUT_OF_ORDER}
 
 api:
   info:
@@ -28,7 +38,7 @@ api:
 # Swagger Configuration
 springdoc:
   api-docs:
-    path: /api-docs
+    path: ${SPRINGDOC_API_DOCS_PATH}
   swagger-ui:
-    path: /swagger-ui.html
-    enabled: true
+    path: ${SPRINGDOC_SWAGGER_UI_PATH}
+    enabled: ${SPRINGDOC_SWAGGER_ENABLED}
