@@ -16,7 +16,7 @@ import java.util.UUID;
 public class UserResponseDTO {
     private UUID id;
     private String email;
-    private String FirstName;
+    private String firstName;
     private String lastName;
     private String phoneNumber;
     private Boolean isEnabled;
@@ -26,5 +26,4 @@ public class UserResponseDTO {
     private Set<RoleResponseDTO> roles;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
-
 }
