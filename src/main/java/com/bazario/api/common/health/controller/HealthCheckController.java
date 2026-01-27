@@ -1,7 +1,7 @@
-package com.bazario.api.controller;
+package com.bazario.api.common.health.controller;
 
-import com.bazario.api.model.dto.HealthCheckResponse;
-import com.bazario.api.service.HealthCheckService;
+import com.bazario.api.common.health.dto.HealthCheckResponse;
+import com.bazario.api.common.health.service.HealthCheckService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
