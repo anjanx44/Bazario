@@ -41,4 +41,4 @@ springdoc:
     path: ${SPRINGDOC_API_DOCS_PATH}
   swagger-ui:
     path: ${SPRINGDOC_SWAGGER_UI_PATH}
-    enabled: ${SPRINGDOC_SWAGGER_ENABLED}
+    enabled: ${SPRINGDOC_SWAGGER_ENABLED:true}
