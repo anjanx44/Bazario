@@ -1,6 +1,6 @@
-package com.bazario.api.service;
+package com.bazario.api.common.health.service;
 
-import com.bazario.api.model.dto.HealthCheckResponse;
+import com.bazario.api.common.health.dto.HealthCheckResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

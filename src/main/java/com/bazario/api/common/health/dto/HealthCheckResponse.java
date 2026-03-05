@@ -1,4 +1,4 @@
-package com.bazario.api.model.dto;
+package com.bazario.api.common.health.dto;
 
 import lombok.Builder;
 import lombok.Data;
