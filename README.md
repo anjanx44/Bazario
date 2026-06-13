@@ -1,50 +1,30 @@
-# 🛒 Bazario - Modern E-Commerce Ecosystem
+# 🛒 Bazario - Enterprise Multi-Module Monorepo
 
-**Bazario** is a high-performance, scalable e-commerce backend built with **Spring Boot 3**, focusing on clean architecture, data integrity, and developer experience. This project serves as a collaborative learning platform for building industry-standard enterprise applications.
+Welcome to **Bazario**, a modern, high-performance e-commerce ecosystem. This repository is organized as a monorepo containing the backend service, admin panel, and customer storefront.
 
----
+## 🏗 Project Structure
 
-## 🚀 Tech Stack
+- **[apps/backend](apps/backend)**: Spring Boot 3.x Modular Monolith Application.
+- **[apps/admin](apps/admin)**: Next.js 15 Admin Panel for internal management.
+- **[apps/storefront](apps/storefront)**: Next.js 15 Public Customer-Facing Application.
+- **[docker](docker)**: Local infrastructure setup using Docker Compose (PostgreSQL, Redis).
+- **[docs](docs)**: Technical documentation hub.
 
-- **Backend:** Java 21, Spring Boot 3.3+
-- **Database:** PostgreSQL
-- **Migration:** Flyway (Database Versioning)
-- **Documentation:** Swagger UI / OpenAPI 3
-- **Build Tool:** Maven
+## 📄 Documentation Hub
 
----
+Explore our detailed documentation to get started:
 
-## 🏛 Architecture Overview
+- 🏛 **[Architecture Overview](docs/architecture-overview.md)**
+- 🗄 **[Database Design](docs/database-design.md)**
+- 🚀 **[Onboarding Guide](docs/onboarding-guide.md)**
 
-Bazario follows a **Domain-Driven Design (DDD)** approach with a classic 3-layer architecture to ensure concerns are separated and the codebase remains maintainable.
+## 🛠 Tech Stack
 
-- **API Layer:** REST Controllers handling HTTP requests and DTO mapping.
-- **Service Layer:** Core business logic, transactional boundaries, and domain rules.
-- **Persistence Layer:** Spring Data JPA with Flyway for schema migrations.
-
----
-
-## 🛠 Features (Upcoming)
-
-- [ ] **Database Infrastructure:** Versioned migrations using Flyway.
-- [ ] **Schema Design:** UUID-based primary keys and high-precision monetary handling (Decimal).
-- [ ] **Product Management:** Full CRUD for Categories and Products.
-- [ ] **Inventory System:** Real-time stock tracking and low-stock alerts.
-- [ ] **Auth & Security:** Role-based access control (Admin/Customer).
-
----
+- **Backend**: Java 21, Spring Boot 3.x, Hibernate, Flyway, PostgreSQL.
+- **Frontend**: Next.js 15, React, Tailwind CSS.
+- **Orchestration**: PNPM Workspaces, Turborepo.
+- **Infrastructure**: Docker, GitHub Actions.
 
 ## 🚦 Getting Started
 
-### Prerequisites
-- JDK 21
-- PostgreSQL 15+
-- Maven 3.9+
-
-### Installation
-
-1. **Fork the repository** to your own GitHub account.
-2. **Clone your fork:**
-   ```bash
-   git clone [https://github.com/your-username/Bazario.git](https://github.com/your-username/Bazario.git)
-   cd Bazario
+Refer to the **[Onboarding Guide](docs/onboarding-guide.md)** for detailed instructions on setting up your local environment.
