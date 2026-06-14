@@ -5,6 +5,7 @@ import com.bazario.catalog.ports.in.ProductUseCase;
 import com.bazario.customers.domain.model.CustomerAddress;
 import com.bazario.customers.ports.in.CustomerUseCase;
 import com.bazario.inventory.ports.in.InventoryUseCase;
+import com.bazario.orders.application.model.DashboardMetrics;
 import com.bazario.orders.domain.model.Order;
 import com.bazario.orders.domain.model.OrderItem;
 import com.bazario.orders.domain.model.OrderStatus;
@@ -12,6 +13,8 @@ import com.bazario.orders.ports.in.OrderUseCase;
 import com.bazario.orders.ports.out.OrderRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -86,5 +89,46 @@ public class OrderService implements OrderUseCase {
     @Transactional(readOnly = true)
     public List<Order> getOrdersByCustomerId(UUID customerId) {
         return orderRepositoryPort.findByCustomerId(customerId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Order> listOrders(
+            Pageable pageable,
+            OrderStatus status,
+            String search,
+            String fromDate,
+            String toDate
+    ) {
+        return orderRepositoryPort.findAllOrders(pageable, status, search, fromDate, toDate);
+    }
+
+    @Override
+    @Transactional
+    public Optional<Order> updateOrderStatus(UUID orderId, OrderStatus newStatus) {
+        return orderRepositoryPort.findById(orderId).map(order -> {
+            order.setStatus(newStatus);
+            order.setUpdatedAt(ZonedDateTime.now());
+            return orderRepositoryPort.save(order);
+        });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DashboardMetrics getDashboardMetrics() {
+        double totalRevenue = orderRepositoryPort.sumTotalRevenue();
+        long   totalOrders  = orderRepositoryPort.countAll();
+
+        // TODO: replace stubs with real counts once customer/product count ports are added
+        long totalCustomers = 0L;
+        long activeProducts = 0L;
+
+        // TODO: compute period-over-period change percentages from historical data
+        return new DashboardMetrics(
+                totalRevenue,   12.5,
+                totalOrders,    8.2,
+                totalCustomers, 5.1,
+                activeProducts, -2.3
+        );
     }
 }
