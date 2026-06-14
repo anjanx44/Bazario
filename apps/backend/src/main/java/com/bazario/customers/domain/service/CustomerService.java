@@ -49,6 +49,12 @@ public class CustomerService implements CustomerUseCase {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<Customer> getCustomerByEmail(String email) {
+        return customerRepositoryPort.findByEmail(email);
+    }
+
+    @Override
     public CustomerAddress addAddress(UUID customerId, CustomerAddress address) {
         log.info("Adding new address for customer: {}", customerId);
         
