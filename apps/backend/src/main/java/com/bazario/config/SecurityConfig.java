@@ -2,6 +2,7 @@ package com.bazario.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -75,8 +76,8 @@ public class SecurityConfig {
             // Authorization rules
             .authorizeHttpRequests(auth -> auth
                 // Public storefront catalog
-                .requestMatchers("GET", "/api/v1/products/**").permitAll()
-                .requestMatchers("GET", "/api/v1/categories/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
                 // Public auth endpoints
                 .requestMatchers("/api/v1/auth/login").permitAll()
                 .requestMatchers("/api/v1/auth/register").permitAll()
