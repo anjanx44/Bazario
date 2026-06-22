@@ -42,3 +42,8 @@ springdoc:
   swagger-ui:
     path: ${SPRINGDOC_SWAGGER_UI_PATH}
     enabled: ${SPRINGDOC_SWAGGER_ENABLED:true}
+
+# JWT token
+jwt:
+  secret: ${JWT_SECRET}
+  expiration-ms: ${JWT_EXPIRATION_MS}
