@@ -20,7 +20,8 @@ import java.util.UUID;
  */
 public interface OrderUseCase {
 
-    Order createOrder(Order order);
+    /** Command: persists the order and returns its ID. Query with {@link #getOrderById} for the read model. */
+    UUID createOrder(Order order);
 
     Optional<Order> getOrderById(UUID id);
 
@@ -38,8 +39,8 @@ public interface OrderUseCase {
             String toDate
     );
 
-    /** Admin: update a single order's status. */
-    Optional<Order> updateOrderStatus(UUID orderId, OrderStatus newStatus);
+    /** Admin command: update a single order's status. Returns whether the order existed. */
+    boolean updateOrderStatus(UUID orderId, OrderStatus newStatus);
 
     /**
      * Admin: aggregated KPI metrics for the dashboard.

@@ -152,7 +152,10 @@ public class AdminController {
             @Valid @RequestBody AdminDtos.UpdateOrderStatusRequest request
     ) {
         OrderStatus newStatus = OrderStatus.valueOf(request.status().toUpperCase());
-        return orderUseCase.updateOrderStatus(orderId, newStatus)
+        if (!orderUseCase.updateOrderStatus(orderId, newStatus)) {
+            return ResponseEntity.notFound().build();
+        }
+        return orderUseCase.getOrderById(orderId)
                 .map(order -> ResponseEntity.ok(toDto(order)))
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -228,8 +231,10 @@ public class AdminController {
             @Valid @RequestBody AdminDtos.AdminCreateProductRequest request) {
 
         Product product = toDomain(request);
-        Product created = productUseCase.createProduct(
+        UUID productId = productUseCase.createProduct(
                 product, request.initialStock(), request.lowStockThreshold());
+        Product created = productUseCase.getProductById(productId)
+                .orElseThrow(() -> new IllegalStateException("Product not found after create: " + productId));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(toDto(created));
     }
@@ -326,7 +331,9 @@ public class AdminController {
             @Valid @RequestBody AdminDtos.AdminAdjustStockRequest request) {
         return inventoryUseCase.getInventoryByProductId(productId)
                 .map(existing -> {
-                    Inventory updated = inventoryUseCase.updateStock(productId, request.quantityChange());
+                    inventoryUseCase.updateStock(productId, request.quantityChange());
+                    Inventory updated = inventoryUseCase.getInventoryByProductId(productId)
+                            .orElseThrow(() -> new IllegalStateException("Inventory not found after update: " + productId));
                     return ResponseEntity.ok(toDto(updated));
                 })
                 .orElse(ResponseEntity.notFound().build());
