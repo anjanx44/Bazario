@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -123,7 +124,7 @@ public class AdminController {
         Sort.Direction direction  = sortParts.length > 1 && sortParts[1].equalsIgnoreCase("asc")
                 ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable       pageable   = PageRequest.of(page, size, Sort.by(direction, sortParts[0]));
-        OrderStatus    orderStatus = status != null ? OrderStatus.valueOf(status.toUpperCase()) : null;
+        OrderStatus    orderStatus = parseOrderStatus(status);
 
         Page<Order> orderPage = orderUseCase.listOrders(pageable, orderStatus, search, fromDate, toDate);
 
@@ -151,7 +152,7 @@ public class AdminController {
             @PathVariable UUID orderId,
             @Valid @RequestBody AdminDtos.UpdateOrderStatusRequest request
     ) {
-        OrderStatus newStatus = OrderStatus.valueOf(request.status().toUpperCase());
+        OrderStatus newStatus = parseOrderStatus(request.status());
         if (!orderUseCase.updateOrderStatus(orderId, newStatus)) {
             return ResponseEntity.notFound().build();
         }
@@ -416,6 +417,24 @@ public class AdminController {
                         && inv.getLowStockThreshold() != null
                         && inv.getStockQuantity() <= inv.getLowStockThreshold()
         );
+    }
+
+    /**
+     * Case-insensitive {@link OrderStatus} parsing.
+     * Blank/null values mean "no filter"; unknown values throw a
+     * {@link IllegalArgumentException} that the global handler turns
+     * into a 400 Bad Request.
+     */
+    private OrderStatus parseOrderStatus(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+        try {
+            return OrderStatus.valueOf(raw.toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException(
+                    "Invalid order status: '" + raw + "'. Allowed: " + Arrays.toString(OrderStatus.values()));
+        }
     }
 
     private Product toDomain(AdminDtos.AdminCreateProductRequest request) {
