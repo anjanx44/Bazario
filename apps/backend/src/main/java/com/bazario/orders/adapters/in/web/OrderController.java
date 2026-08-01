@@ -22,7 +22,9 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<OrderDtos.OrderResponse> createOrder(@RequestBody OrderDtos.CreateOrderRequest request) {
         Order order = webMapper.toDomain(request);
-        Order savedOrder = orderUseCase.createOrder(order);
+        UUID orderId = orderUseCase.createOrder(order);
+        Order savedOrder = orderUseCase.getOrderById(orderId)
+                .orElseThrow(() -> new IllegalStateException("Order not found after create: " + orderId));
         return ResponseEntity.ok(webMapper.toResponse(savedOrder));
     }
 

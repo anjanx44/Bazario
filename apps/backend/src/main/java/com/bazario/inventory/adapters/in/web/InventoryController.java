@@ -29,8 +29,11 @@ public class InventoryController {
     public ResponseEntity<InventoryDtos.InventoryResponse> updateStock(
             @PathVariable UUID productId,
             @RequestBody InventoryDtos.UpdateStockRequest request) {
-        Inventory inventory = inventoryUseCase.updateStock(productId, request.quantityChange());
-        return ResponseEntity.ok(webMapper.toResponse(inventory));
+        inventoryUseCase.updateStock(productId, request.quantityChange());
+        return inventoryUseCase.getInventoryByProductId(productId)
+                .map(webMapper::toResponse)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{productId}")
