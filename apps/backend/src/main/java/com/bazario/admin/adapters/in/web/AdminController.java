@@ -228,10 +228,8 @@ public class AdminController {
             @Valid @RequestBody AdminDtos.AdminCreateProductRequest request) {
 
         Product product = toDomain(request);
-        Product created = productUseCase.createProduct(product);
-
-        inventoryUseCase.initializeInventory(
-                created.getId(), request.initialStock(), request.lowStockThreshold());
+        Product created = productUseCase.createProduct(
+                product, request.initialStock(), request.lowStockThreshold());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(toDto(created));
     }
