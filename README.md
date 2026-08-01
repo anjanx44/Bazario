@@ -1,50 +1,54 @@
-# 🛒 Bazario - Modern E-Commerce Ecosystem
+# 🛒 Bazario - Enterprise Multi-Module Monorepo
 
-**Bazario** is a high-performance, scalable e-commerce backend built with **Spring Boot 3**, focusing on clean architecture, data integrity, and developer experience. This project serves as a collaborative learning platform for building industry-standard enterprise applications.
+Welcome to **Bazario**, a modern, high-performance e-commerce ecosystem. This repository is organized as a monorepo containing the backend service, admin panel, and customer storefront.
 
----
+## 🏗 Project Structure
 
-## 🚀 Tech Stack
+- **[apps/backend](apps/backend)**: Spring Boot 3.x Modular Monolith Application.
+- **[apps/admin](apps/admin)**: Next.js 15 Admin Panel for internal management.
+- **[apps/storefront](apps/storefront)**: Next.js 15 Public Customer-Facing Application.
+- **[docker](docker)**: Local infrastructure setup using Docker Compose (PostgreSQL, Redis).
+- **[docs](docs)**: Technical documentation hub.
 
-- **Backend:** Java 21, Spring Boot 3.3+
-- **Database:** PostgreSQL
-- **Migration:** Flyway (Database Versioning)
-- **Documentation:** Swagger UI / OpenAPI 3
-- **Build Tool:** Maven
+## 📄 Documentation Hub
 
----
+Explore our detailed documentation to get started:
 
-## 🏛 Architecture Overview
+- 🏛 **[Architecture Overview](docs/architecture-overview.md)**
+- 🗄 **[Database Design](docs/database-design.md)**
+- 🚀 **[Onboarding Guide](docs/onboarding-guide.md)**
 
-Bazario follows a **Domain-Driven Design (DDD)** approach with a classic 3-layer architecture to ensure concerns are separated and the codebase remains maintainable.
+## 🛠 Tech Stack
 
-- **API Layer:** REST Controllers handling HTTP requests and DTO mapping.
-- **Service Layer:** Core business logic, transactional boundaries, and domain rules.
-- **Persistence Layer:** Spring Data JPA with Flyway for schema migrations.
-
----
-
-## 🛠 Features (Upcoming)
-
-- [ ] **Database Infrastructure:** Versioned migrations using Flyway.
-- [ ] **Schema Design:** UUID-based primary keys and high-precision monetary handling (Decimal).
-- [ ] **Product Management:** Full CRUD for Categories and Products.
-- [ ] **Inventory System:** Real-time stock tracking and low-stock alerts.
-- [ ] **Auth & Security:** Role-based access control (Admin/Customer).
-
----
+- **Backend**: Java 21, Spring Boot 3.x, Hibernate, Flyway, PostgreSQL.
+- **Frontend**: Next.js 15, React, Tailwind CSS.
+- **Orchestration**: PNPM Workspaces, Turborepo.
+- **Infrastructure**: Docker, GitHub Actions.
 
 ## 🚦 Getting Started
 
-### Prerequisites
-- JDK 21
-- PostgreSQL 15+
-- Maven 3.9+
+Refer to the **[Onboarding Guide](docs/onboarding-guide.md)** for detailed instructions on setting up your local environment.
 
-### Installation
+---
 
-1. **Fork the repository** to your own GitHub account.
-2. **Clone your fork:**
-   ```bash
-   git clone [https://github.com/your-username/Bazario.git](https://github.com/your-username/Bazario.git)
-   cd Bazario
+## 📐 System Architecture & Documentation
+
+Enterprise-grade technical documentation for engineering onboarding, architectural review, and API integration. All documents are located under the `docs/` directory.
+
+### Architecture Documents
+
+| # | Document | Path | Description | Primary Audience |
+|---|---|---|---|---|
+| 1 | **Database Design** | [`docs/architecture/database-design.md`](docs/architecture/database-design.md) | Full PostgreSQL DDL scripts for all 7 tables across 4 bounded contexts (Catalog, Orders, Inventory, Customers). Includes data dictionary, index rationale, and constraint definitions. | Backend Engineers, DBAs |
+| 2 | **UML Diagrams** | [`docs/architecture/uml-diagrams.md`](docs/architecture/uml-diagrams.md) | Three Mermaid.js diagrams: Entity Relationship Diagram (ERD), Hexagonal Architecture Class Diagram (Admin/Orders module), and a full Sequence Diagram for Admin Authentication + Order Status Update flow. | All Engineers, Tech Leads |
+| 3 | **API Contracts** | [`docs/development/api-contracts.md`](docs/development/api-contracts.md) | Strict REST API specifications for 4 core endpoints: Customer Login, Product Detail (Storefront), Dashboard Metrics, and Paged Product Management (Admin). Includes exact JSON payloads, all HTTP status codes, and a shared error response schema. | Frontend Engineers, QA, Integrators |
+
+### Quick Navigation
+
+| I want to… | Go to… |
+|---|---|
+| Understand the database schema and table relationships | [`docs/architecture/database-design.md`](docs/architecture/database-design.md) |
+| See how Hexagonal Architecture layers connect end-to-end | [`docs/architecture/uml-diagrams.md`](docs/architecture/uml-diagrams.md) |
+| Integrate the Next.js frontend with the Java REST API | [`docs/development/api-contracts.md`](docs/development/api-contracts.md) |
+| Onboard to the full monorepo and run it locally | [`docs/onboarding-guide.md`](docs/onboarding-guide.md) |
+| Read the high-level system architecture overview | [`docs/architecture-overview.md`](docs/architecture-overview.md) |

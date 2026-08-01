@@ -1,4 +1,0 @@
-# Spring Boot ApplicationContextInitializer
-# This ensures .env variables are loaded before Spring Boot starts
-org.springframework.context.ApplicationContextInitializer=\
-com.bazario.api.config.DotEnvConfig
