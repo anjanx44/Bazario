@@ -56,7 +56,7 @@ public class ProductService implements ProductUseCase {
     @Override
     @Transactional(readOnly = true)
     public Optional<Product> getProductBySlug(String slug) {
-        return productRepositoryPort.findBySlug(slug);
+        return productRepositoryPort.findBySlug(slug).filter(Product::isActive);
     }
 
     @Override
