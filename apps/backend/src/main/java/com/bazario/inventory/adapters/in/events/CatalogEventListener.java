@@ -19,7 +19,8 @@ public class CatalogEventListener {
     public void handleProductCreated(ProductCreatedEvent event) {
         log.info("Received ProductCreatedEvent for product: {} (SKU: {})", event.productId(), event.sku());
         try {
-            inventoryUseCase.initializeInventory(event.productId(), 0, 10);
+            inventoryUseCase.initializeInventory(
+                    event.productId(), event.initialStock(), event.lowStockThreshold());
             log.info("Successfully initialized inventory for product: {}", event.productId());
         } catch (Exception e) {
             log.error("Failed to initialize inventory for product: {}. Error: {}", event.productId(), e.getMessage());

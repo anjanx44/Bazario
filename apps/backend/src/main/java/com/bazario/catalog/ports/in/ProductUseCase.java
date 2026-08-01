@@ -23,6 +23,13 @@ public interface ProductUseCase {
 
     Product createProduct(Product product);
 
+    /**
+     * Admin: create a product with requested initial inventory values.
+     * Stock values are published on {@link com.bazario.catalog.domain.model.ProductCreatedEvent}
+     * so the inventory context initializes a single time with the given values.
+     */
+    Product createProduct(Product product, Integer initialStock, Integer lowStockThreshold);
+
     Optional<Product> getProductBySlug(String slug);
 
     Optional<Product> getProductById(UUID id);
