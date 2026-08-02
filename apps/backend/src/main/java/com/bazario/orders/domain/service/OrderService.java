@@ -36,7 +36,7 @@ public class OrderService implements OrderUseCase {
 
     @Override
     @Transactional
-    public Order createOrder(Order order) {
+    public UUID createOrder(Order order) {
         log.info("Placing new order for customer: {}", order.getCustomerId());
 
         // 1. Validate Customer existence
@@ -76,7 +76,7 @@ public class OrderService implements OrderUseCase {
         order.setUpdatedAt(ZonedDateTime.now());
 
         // 5. Save Order
-        return orderRepositoryPort.save(order);
+        return orderRepositoryPort.save(order).getId();
     }
 
     @Override
@@ -105,12 +105,13 @@ public class OrderService implements OrderUseCase {
 
     @Override
     @Transactional
-    public Optional<Order> updateOrderStatus(UUID orderId, OrderStatus newStatus) {
+    public boolean updateOrderStatus(UUID orderId, OrderStatus newStatus) {
         return orderRepositoryPort.findById(orderId).map(order -> {
             order.setStatus(newStatus);
             order.setUpdatedAt(ZonedDateTime.now());
-            return orderRepositoryPort.save(order);
-        });
+            orderRepositoryPort.save(order);
+            return true;
+        }).orElse(false);
     }
 
     @Override

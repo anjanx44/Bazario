@@ -24,7 +24,9 @@ public class CustomerController {
     public ResponseEntity<CustomerDtos.CustomerResponse> register(
             @RequestBody CustomerDtos.RegisterRequest request) {
         Customer customer = webMapper.toDomain(request);
-        Customer registeredCustomer = customerUseCase.registerCustomer(customer);
+        UUID customerId = customerUseCase.registerCustomer(customer);
+        Customer registeredCustomer = customerUseCase.getCustomerById(customerId)
+                .orElseThrow(() -> new IllegalStateException("Customer not found after register: " + customerId));
         return ResponseEntity.ok(webMapper.toResponse(registeredCustomer));
     }
 

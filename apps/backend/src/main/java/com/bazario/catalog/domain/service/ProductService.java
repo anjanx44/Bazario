@@ -30,7 +30,13 @@ public class ProductService implements ProductUseCase {
 
     @Override
     @Transactional
-    public Product createProduct(Product product) {
+    public UUID createProduct(Product product) {
+        return createProduct(product, null, null);
+    }
+
+    @Override
+    @Transactional
+    public UUID createProduct(Product product, Integer initialStock, Integer lowStockThreshold) {
         if (productRepositoryPort.findBySku(product.getSku()).isPresent()) {
             throw new IllegalArgumentException("Product with SKU " + product.getSku() + " already exists");
         }
@@ -41,15 +47,16 @@ public class ProductService implements ProductUseCase {
 
         Product savedProduct = productRepositoryPort.save(product);
 
-        eventPublisher.publishEvent(new ProductCreatedEvent(savedProduct.getId(), savedProduct.getSku()));
+        eventPublisher.publishEvent(new ProductCreatedEvent(
+                savedProduct.getId(), savedProduct.getSku(), initialStock, lowStockThreshold));
 
-        return savedProduct;
+        return savedProduct.getId();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<Product> getProductBySlug(String slug) {
-        return productRepositoryPort.findBySlug(slug);
+        return productRepositoryPort.findBySlug(slug).filter(Product::isActive);
     }
 
     @Override

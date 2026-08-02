@@ -15,6 +15,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 /**
  * Customer Authentication Controller
  *
@@ -128,7 +130,7 @@ public class AuthController {
                     .body(new AuthDtos.MessageResponse("An account with this email already exists."));
         }
 
-        Customer newCustomer = customerUseCase.registerCustomer(
+        UUID newCustomerId = customerUseCase.registerCustomer(
                 Customer.builder()
                         .firstName(request.firstName())
                         .lastName(request.lastName())
@@ -136,6 +138,8 @@ public class AuthController {
                         .passwordHash(request.password()) // hashed inside CustomerService
                         .build()
         );
+        Customer newCustomer = customerUseCase.getCustomerById(newCustomerId)
+                .orElseThrow(() -> new IllegalStateException("Customer not found after register: " + newCustomerId));
 
         // TODO: replace stub with real JWT generation:
         String accessToken  = "TODO_GENERATE_JWT_ACCESS_TOKEN";
