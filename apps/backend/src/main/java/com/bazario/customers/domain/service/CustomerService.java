@@ -25,7 +25,7 @@ public class CustomerService implements CustomerUseCase {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public Customer registerCustomer(Customer customer) {
+    public UUID registerCustomer(Customer customer) {
         log.info("Registering new customer with email: {}", customer.getEmail());
 
         if (customerRepositoryPort.findByEmail(customer.getEmail()).isPresent()) {
@@ -39,7 +39,7 @@ public class CustomerService implements CustomerUseCase {
         customer.setCreatedAt(ZonedDateTime.now());
         customer.setUpdatedAt(ZonedDateTime.now());
 
-        return customerRepositoryPort.save(customer);
+        return customerRepositoryPort.save(customer).getId();
     }
 
     @Override

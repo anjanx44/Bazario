@@ -41,7 +41,7 @@ public class InventoryService implements InventoryUseCase {
 
     @Override
     @Transactional
-    public Inventory updateStock(UUID productId, Integer quantityChange) {
+    public int updateStock(UUID productId, Integer quantityChange) {
         log.info("Updating stock for product {} by {}", productId, quantityChange);
         
         Inventory inventory = inventoryRepositoryPort.findByProductId(productId)
@@ -57,7 +57,8 @@ public class InventoryService implements InventoryUseCase {
         inventory.setStockQuantity(newQuantity);
         inventory.setUpdatedAt(ZonedDateTime.now());
         
-        return inventoryRepositoryPort.save(inventory);
+        inventoryRepositoryPort.save(inventory);
+        return newQuantity;
     }
 
     @Override

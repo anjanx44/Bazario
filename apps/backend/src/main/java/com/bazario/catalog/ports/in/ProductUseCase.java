@@ -21,7 +21,16 @@ import java.util.UUID;
  */
 public interface ProductUseCase {
 
-    Product createProduct(Product product);
+    /** Command: persists the product and returns its ID. Query with {@link #getProductById} for the read model. */
+    UUID createProduct(Product product);
+
+    /**
+     * Admin command: create a product with requested initial inventory values.
+     * Stock values are published on {@link com.bazario.catalog.domain.model.ProductCreatedEvent}
+     * so the inventory context initializes a single time with the given values.
+     * Returns the created product ID.
+     */
+    UUID createProduct(Product product, Integer initialStock, Integer lowStockThreshold);
 
     Optional<Product> getProductBySlug(String slug);
 

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Tag(name = "Storefront Catalog", description = "Public product catalog endpoints for the Bazario storefront")
 @RestController
@@ -100,7 +101,9 @@ public class ProductController {
     public ResponseEntity<CatalogDtos.ProductResponse> createProduct(
             @Valid @RequestBody CatalogDtos.CreateProductRequest request) {
         Product product = webMapper.toDomain(request);
-        Product created = productUseCase.createProduct(product);
+        UUID productId = productUseCase.createProduct(product);
+        Product created = productUseCase.getProductById(productId)
+                .orElseThrow(() -> new IllegalStateException("Product not found after create: " + productId));
         return ResponseEntity.ok(webMapper.toResponse(created));
     }
 }

@@ -7,7 +7,9 @@ import java.util.UUID;
 
 public interface InventoryUseCase {
     Inventory initializeInventory(UUID productId, Integer initialStock, Integer lowStockThreshold);
-    Inventory updateStock(UUID productId, Integer quantityChange);
+
+    /** Command: adjust stock and return the new quantity. Query with {@link #getInventoryByProductId} for the full read model. */
+    int updateStock(UUID productId, Integer quantityChange);
     Optional<Inventory> getInventoryByProductId(UUID productId);
     boolean isStockAvailable(UUID productId, Integer requestedQuantity);
 }

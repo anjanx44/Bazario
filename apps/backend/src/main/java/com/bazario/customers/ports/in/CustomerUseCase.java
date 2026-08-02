@@ -8,7 +8,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CustomerUseCase {
-    Customer registerCustomer(Customer customer);
+    /** Command: registers the customer and returns their ID. Query with {@link #getCustomerById} for the read model. */
+    UUID registerCustomer(Customer customer);
     Optional<Customer> getCustomerById(UUID id);
     Optional<Customer> getCustomerByEmail(String email);
     CustomerAddress addAddress(UUID customerId, CustomerAddress address);
