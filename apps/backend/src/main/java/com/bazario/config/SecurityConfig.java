@@ -1,5 +1,7 @@
 package com.bazario.config;
 
+import com.bazario.auth.domain.service.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 /**
@@ -26,7 +29,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
  * - Admin routes: /api/v1/admin/** require ROLE_ADMIN.
  * - All other routes require authentication.
  *
- * TODO: inject JwtAuthenticationFilter once JwtService is implemented.
  */
 @Configuration
 @EnableWebSecurity
@@ -39,7 +41,7 @@ public class SecurityConfig {
     }
 
     /**
-     * Expose AuthenticationManager as a bean so AuthController can inject it.
+     * Expose AuthenticationManager as a bean for the authentication service.
      */
     @Bean
     public AuthenticationManager authenticationManager(
@@ -60,7 +62,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            CorsConfigurationSource corsConfigurationSource) throws Exception {
+            CorsConfigurationSource corsConfigurationSource,
+            JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
 
         http
             // Disable CSRF — stateless JWT API
@@ -73,6 +76,12 @@ public class SecurityConfig {
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint((request, response, exception) ->
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+                .accessDeniedHandler((request, response, exception) ->
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN)))
+
             // Authorization rules
             .authorizeHttpRequests(auth -> auth
                 // Public storefront catalog
@@ -84,6 +93,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/refresh").permitAll()
                 .requestMatchers("/api/v1/auth/forgot-password").permitAll()
                 .requestMatchers("/api/v1/auth/reset-password").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/auth/me").authenticated()
                 // OpenAPI / Swagger UI
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 // Admin portal — requires ADMIN role
@@ -92,8 +102,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             );
 
-        // TODO: add JWT filter before UsernamePasswordAuthenticationFilter:
-        // http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
