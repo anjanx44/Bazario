@@ -1,6 +1,8 @@
 package com.bazario.auth.adapters.in.web;
 
 import com.bazario.auth.adapters.in.web.dto.AuthDtos;
+import com.bazario.auth.domain.service.AuthTokenService;
+import com.bazario.auth.domain.service.PasswordResetService;
 import com.bazario.customers.domain.model.Customer;
 import com.bazario.customers.ports.in.CustomerUseCase;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,20 +11,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 /**
  * Customer Authentication Controller
  *
  * Handles all public-facing auth flows for the Bazario storefront.
- * JWT generation is delegated to JwtService (to be implemented in
- * com.bazario.auth.domain.service.JwtService).
+ * Authentication and token issuance are delegated to AuthTokenService.
  *
  * Endpoints:
  *   POST /api/v1/auth/login           — credential login → JWT
@@ -43,10 +40,8 @@ import java.util.UUID;
 public class AuthController {
 
     private final CustomerUseCase customerUseCase;
-    private final AuthenticationManager authenticationManager;
-
-    // TODO: inject JwtService once implemented:
-    // private final JwtService jwtService;
+    private final AuthTokenService authTokenService;
+    private final PasswordResetService passwordResetService;
 
     // ── POST /api/v1/auth/login ───────────────────────────────────────────────
     /**
@@ -74,33 +69,9 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody AuthDtos.LoginRequest request) {
         try {
-            Authentication auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.email(), request.password())
-            );
-
-            // TODO: replace stub with real JWT generation:
-            // String accessToken  = jwtService.generateAccessToken(auth, request.rememberMe());
-            // String refreshToken = jwtService.generateRefreshToken(auth);
-            String accessToken  = "TODO_GENERATE_JWT_ACCESS_TOKEN";
-            String refreshToken = "TODO_GENERATE_JWT_REFRESH_TOKEN";
-            long   expiresIn    = request.rememberMe() ? 2592000L : 3600L; // 30d or 1h
-
-            Customer customer = customerUseCase.getCustomerByEmail(request.email())
-                    .orElseThrow(() -> new IllegalStateException("Authenticated customer not found"));
-
-            AuthDtos.CustomerProfileResponse profile = new AuthDtos.CustomerProfileResponse(
-                    customer.getId(),
-                    customer.getFirstName(),
-                    customer.getLastName(),
-                    customer.getEmail(),
-                    null,
-                    customer.getCreatedAt()
-            );
-
-            return ResponseEntity.ok(new AuthDtos.AuthTokenResponse(
-                    accessToken, refreshToken, "Bearer", expiresIn, profile));
-
-        } catch (BadCredentialsException ex) {
+            return ResponseEntity.ok(tokenResponse(
+                    authTokenService.login(request.email(), request.password(), request.rememberMe())));
+        } catch (AuthenticationException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new AuthDtos.MessageResponse("Invalid email or password."));
         }
@@ -124,38 +95,14 @@ public class AuthController {
     @Operation(summary = "Register a new customer account")
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody AuthDtos.RegisterRequest request) {
-        boolean exists = customerUseCase.getCustomerByEmail(request.email()).isPresent();
-        if (exists) {
+        try {
+            AuthTokenService.TokenPair tokens = authTokenService.register(
+                    request.firstName(), request.lastName(), request.email(), request.password());
+            return ResponseEntity.status(HttpStatus.CREATED).body(tokenResponse(tokens));
+        } catch (AuthTokenService.EmailAlreadyRegisteredException ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new AuthDtos.MessageResponse("An account with this email already exists."));
         }
-
-        UUID newCustomerId = customerUseCase.registerCustomer(
-                Customer.builder()
-                        .firstName(request.firstName())
-                        .lastName(request.lastName())
-                        .email(request.email())
-                        .passwordHash(request.password()) // hashed inside CustomerService
-                        .build()
-        );
-        Customer newCustomer = customerUseCase.getCustomerById(newCustomerId)
-                .orElseThrow(() -> new IllegalStateException("Customer not found after register: " + newCustomerId));
-
-        // TODO: replace stub with real JWT generation:
-        String accessToken  = "TODO_GENERATE_JWT_ACCESS_TOKEN";
-        String refreshToken = "TODO_GENERATE_JWT_REFRESH_TOKEN";
-
-        AuthDtos.CustomerProfileResponse profile = new AuthDtos.CustomerProfileResponse(
-                newCustomer.getId(),
-                newCustomer.getFirstName(),
-                newCustomer.getLastName(),
-                newCustomer.getEmail(),
-                null,
-                newCustomer.getCreatedAt()
-        );
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new AuthDtos.AuthTokenResponse(accessToken, refreshToken, "Bearer", 3600L, profile));
     }
 
     // ── POST /api/v1/auth/refresh ─────────────────────────────────────────────
@@ -169,10 +116,12 @@ public class AuthController {
     @Operation(summary = "Refresh access token")
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@Valid @RequestBody AuthDtos.RefreshTokenRequest request) {
-        // TODO: validate refresh token via jwtService.validateRefreshToken(request.refreshToken())
-        // and issue new access token.
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
-                .body(new AuthDtos.MessageResponse("JWT service not yet implemented. Wire JwtService here."));
+        var tokens = authTokenService.refresh(request.refreshToken());
+        if (tokens.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthDtos.MessageResponse("Session expired. Please sign in again."));
+        }
+        return ResponseEntity.ok(tokenResponse(tokens.orElseThrow()));
     }
 
     // ── GET /api/v1/auth/me ───────────────────────────────────────────────────
@@ -188,15 +137,18 @@ public class AuthController {
     public ResponseEntity<AuthDtos.CustomerProfileResponse> me(Authentication authentication) {
         String email = authentication.getName();
         return customerUseCase.getCustomerByEmail(email)
-                .map(customer -> ResponseEntity.ok(new AuthDtos.CustomerProfileResponse(
-                        customer.getId(),
-                        customer.getFirstName(),
-                        customer.getLastName(),
-                        customer.getEmail(),
-                        null,
-                        customer.getCreatedAt()
-                )))
+                .map(customer -> ResponseEntity.ok(customerProfile(customer)))
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+    }
+
+    private AuthDtos.AuthTokenResponse tokenResponse(AuthTokenService.TokenPair tokens) {
+        return new AuthDtos.AuthTokenResponse(tokens.accessToken(), tokens.refreshToken(), "Bearer",
+                tokens.expiresIn(), customerProfile(tokens.customer()));
+    }
+
+    private AuthDtos.CustomerProfileResponse customerProfile(Customer customer) {
+        return new AuthDtos.CustomerProfileResponse(customer.getId(), customer.getFirstName(),
+                customer.getLastName(), customer.getEmail(), null, customer.getCreatedAt());
     }
 
     // ── POST /api/v1/auth/forgot-password ─────────────────────────────────────
@@ -211,8 +163,7 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public ResponseEntity<AuthDtos.MessageResponse> forgotPassword(
             @Valid @RequestBody AuthDtos.ForgotPasswordRequest request) {
-        // TODO: generate a secure reset token, persist it, and send via email service
-        // customerUseCase.initiatePasswordReset(request.email());
+        passwordResetService.requestReset(request.email());
         return ResponseEntity.ok(
                 new AuthDtos.MessageResponse("If that email exists, a reset link has been sent."));
     }
@@ -229,9 +180,10 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ResponseEntity<AuthDtos.MessageResponse> resetPassword(
             @Valid @RequestBody AuthDtos.ResetPasswordRequest request) {
-        // TODO: validate token and update password:
-        // boolean updated = customerUseCase.resetPassword(request.token(), request.newPassword());
-        // if (!updated) return ResponseEntity.badRequest().body(new AuthDtos.MessageResponse("Invalid or expired reset token."));
+        if (!passwordResetService.resetPassword(request.token(), request.newPassword())) {
+            return ResponseEntity.badRequest()
+                    .body(new AuthDtos.MessageResponse("Invalid or expired reset token."));
+        }
         return ResponseEntity.ok(new AuthDtos.MessageResponse("Password updated successfully. You can now sign in."));
     }
 }
