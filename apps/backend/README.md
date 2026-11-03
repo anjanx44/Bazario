@@ -118,15 +118,20 @@ This starts PostgreSQL on port `5432`.
 
 ### 2. Configure Environment
 
-The app reads from `src/main/resources/application-dev.yml`. Create a `.env` file or set environment variables:
+The app reads from `src/main/resources/application-dev.yml`. The following database settings match the root Docker Compose configuration:
 
 ```env
-DB_URL=jdbc:postgresql://localhost:5432/bazario
-DB_USERNAME=bazario
-DB_PASSWORD=bazario
-JWT_SECRET=your-256-bit-secret
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=bazario_dev_db
+DB_USERNAME=dev_user
+DB_PASSWORD=dev_password
 CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001
 ```
+
+Set `JWT_SECRET` to a Base64-encoded secret containing at least 32 cryptographically random bytes. Generate it once with `openssl rand -base64 32`, store it securely, and reuse it across restarts. Optional ISO-8601 duration settings are `JWT_ACCESS_TTL` (default `PT1H`), `JWT_REFRESH_TTL` (`PT24H`), `JWT_REMEMBERED_REFRESH_TTL` (`P30D`), and `JWT_RESET_TTL` (`PT15M`).
+
+The `dev` password-reset notifier deliberately discards tokens and does not send email or log them. A real `PasswordResetNotifier` adapter is required outside `dev`; reset delivery is not production-ready. Password resets do not revoke existing access or refresh tokens, and known/unknown email response times may differ.
 
 ### 3. Run the Application
 
@@ -146,9 +151,16 @@ http://localhost:8080/swagger-ui.html
 
 ## 🧪 Running Tests
 
+Tests require PostgreSQL and `JWT_SECRET`. The database-backed integration tests default to `jdbc:postgresql://localhost:5432/bazario_dev_db` with `postgres` / `postgres`; override `TEST_DB_URL`, `TEST_DB_USERNAME`, and `TEST_DB_PASSWORD` for an isolated test database. For the Docker Compose credentials above:
+
 ```bash
+export JWT_SECRET="$(openssl rand -base64 32)"
+export DB_USERNAME=dev_user DB_PASSWORD=dev_password
+export TEST_DB_USERNAME="$DB_USERNAME" TEST_DB_PASSWORD="$DB_PASSWORD"
 ./mvnw test
 ```
+
+The integration tests apply Flyway migrations and create and remove their own customer records; use a dedicated test database where possible.
 
 ---
 
