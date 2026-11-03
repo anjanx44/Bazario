@@ -4,3 +4,11 @@ spring:
 
   profiles:
     active: dev
+
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    access-ttl: ${JWT_ACCESS_TTL:PT1H}
+    refresh-ttl: ${JWT_REFRESH_TTL:PT24H}
+    remembered-refresh-ttl: ${JWT_REMEMBERED_REFRESH_TTL:P30D}
+    reset-ttl: ${JWT_RESET_TTL:PT15M}

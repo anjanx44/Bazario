@@ -27,6 +27,7 @@ spring:
       - classpath:db/migration/inventory
       - classpath:db/migration/customers
       - classpath:db/migration/orders
+      - classpath:db/migration/auth
     schemas: ${FLYWAY_SCHEMAS:public}
     baseline-version: 0
     validate-on-migrate: ${FLYWAY_VALIDATE_ON_MIGRATE:true}
