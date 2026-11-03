@@ -7,7 +7,7 @@ spring:
 
 security:
   jwt:
-    secret: ${JWT_SECRET}
+    secret: ${JWT_SECRET:MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE=}
     access-ttl: ${JWT_ACCESS_TTL:PT1H}
     refresh-ttl: ${JWT_REFRESH_TTL:PT24H}
     remembered-refresh-ttl: ${JWT_REMEMBERED_REFRESH_TTL:P30D}
