@@ -38,6 +38,11 @@ public class PostgresCustomerAdapter implements CustomerRepositoryPort {
     }
 
     @Override
+    public boolean updatePasswordIfUnchanged(UUID customerId, String expectedPasswordHash, String newPasswordHash) {
+        return customerRepository.updatePasswordIfUnchanged(customerId, expectedPasswordHash, newPasswordHash) == 1;
+    }
+
+    @Override
     public CustomerAddress saveAddress(CustomerAddress address) {
         CustomerAddressJpaEntity entity = mapper.toAddressEntity(address);
         

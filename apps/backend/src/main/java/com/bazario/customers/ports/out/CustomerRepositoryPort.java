@@ -11,6 +11,7 @@ public interface CustomerRepositoryPort {
     Customer save(Customer customer);
     Optional<Customer> findByEmail(String email);
     Optional<Customer> findById(UUID id);
+    boolean updatePasswordIfUnchanged(UUID customerId, String expectedPasswordHash, String newPasswordHash);
     CustomerAddress saveAddress(CustomerAddress address);
     List<CustomerAddress> findAddressesByCustomerId(UUID customerId);
 }

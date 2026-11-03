@@ -12,6 +12,7 @@ public interface CustomerUseCase {
     UUID registerCustomer(Customer customer);
     Optional<Customer> getCustomerById(UUID id);
     Optional<Customer> getCustomerByEmail(String email);
+    boolean changePasswordIfUnchanged(UUID customerId, String expectedPasswordHash, String newPassword);
     CustomerAddress addAddress(UUID customerId, CustomerAddress address);
     List<CustomerAddress> getAddressesByCustomerId(UUID customerId);
 }

@@ -55,6 +55,12 @@ public class CustomerService implements CustomerUseCase {
     }
 
     @Override
+    public boolean changePasswordIfUnchanged(UUID customerId, String expectedPasswordHash, String newPassword) {
+        String newPasswordHash = passwordEncoder.encode(newPassword);
+        return customerRepositoryPort.updatePasswordIfUnchanged(customerId, expectedPasswordHash, newPasswordHash);
+    }
+
+    @Override
     public CustomerAddress addAddress(UUID customerId, CustomerAddress address) {
         log.info("Adding new address for customer: {}", customerId);
         
