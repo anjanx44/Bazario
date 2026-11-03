@@ -4,6 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### OS & Junie ###
+.DS_Store
+.junie/
+
 ### STS ###
 .apt_generated
 .classpath
