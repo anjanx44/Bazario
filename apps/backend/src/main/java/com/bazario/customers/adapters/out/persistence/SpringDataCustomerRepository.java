@@ -11,6 +11,12 @@ import java.util.UUID;
 public interface SpringDataCustomerRepository extends JpaRepository<CustomerJpaEntity, UUID> {
     Optional<CustomerJpaEntity> findByEmail(String email);
 
+    /**
+     * Compare-and-swap on {@code password_hash}: the WHERE clause is the guard.
+     *
+     * <p>Native on purpose — check and write must be one statement, otherwise two
+     * concurrent resets both pass the fingerprint check and the reset token becomes reusable.
+     */
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query(value = """
             UPDATE customers SET password_hash = :newPasswordHash, updated_at = CURRENT_TIMESTAMP
