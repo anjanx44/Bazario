@@ -23,7 +23,7 @@ export const HeroSection = () => {
         <div className="relative group">
           <div className="aspect-[4/5] bg-gray-200 rounded-xl overflow-hidden shadow-2xl relative">
             <Image 
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaTxtT9_grkc81oHlgbbXDwxI9wPbeMh6UZw02iSs0zdMfsMN_1gljcfqBR6iWPVQ2kKFfhpfC_7s8Gp_Lv72Zn0OFe88xPmZrv_bXHp4-fDptdrK2HfUXieaWZBUc4hp4pQBKZqzeUAFT7hk1aVCn99Q9BskR2h3Ly9W3_1x4B-E7i9IQqVwMnURDf5LRF5UWt7hBxtAIUdUbm2rs7QtifjclQKfvBeh3voxUH1YQBwtgNs94CDIOHVocuSCcnrUdiAVLu5fbKJs"
+              src="/images/products/hero.svg"
               alt="AeroSound Elite Headphones"
               fill
               priority
