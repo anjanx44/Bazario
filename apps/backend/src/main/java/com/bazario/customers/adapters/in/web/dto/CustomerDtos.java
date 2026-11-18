@@ -1,5 +1,9 @@
 package com.bazario.customers.adapters.in.web.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -7,19 +11,19 @@ import java.util.UUID;
 public class CustomerDtos {
 
     public record RegisterRequest(
-            String email,
-            String password,
-            String firstName,
+            @NotBlank @Email String email,
+            @NotBlank @Size(min = 8) String password,
+            @NotBlank String firstName,
             String lastName,
             String phone
     ) {}
 
     public record AddressRequest(
-            String addressLine1,
+            @NotBlank String addressLine1,
             String addressLine2,
-            String city,
-            String postalCode,
-            String country,
+            @NotBlank String city,
+            @NotBlank String postalCode,
+            @NotBlank String country,
             boolean isDefault
     ) {}
 

@@ -1,6 +1,10 @@
 package com.bazario.orders.adapters.in.web.dto;
 
 import com.bazario.orders.domain.model.OrderStatus;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -9,13 +13,13 @@ import java.util.UUID;
 public class OrderDtos {
 
     public record CreateOrderRequest(
-            UUID customerId,
-            List<OrderItemRequest> items
+            @NotNull UUID customerId,
+            @NotEmpty @Valid List<OrderItemRequest> items
     ) {}
 
     public record OrderItemRequest(
-            UUID productId,
-            Integer quantity
+            @NotNull UUID productId,
+            @NotNull @Positive Integer quantity
     ) {}
 
     public record OrderResponse(

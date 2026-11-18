@@ -1,18 +1,21 @@
 package com.bazario.inventory.adapters.in.web.dto;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
 public class InventoryDtos {
 
     public record UpdateStockRequest(
-            Integer quantityChange
+            @NotNull Integer quantityChange
     ) {}
 
     public record InitializeInventoryRequest(
-            UUID productId,
-            Integer initialStock,
-            Integer lowStockThreshold
+            @NotNull UUID productId,
+            @NotNull @PositiveOrZero Integer initialStock,
+            @NotNull @PositiveOrZero Integer lowStockThreshold
     ) {}
 
     public record InventoryResponse(

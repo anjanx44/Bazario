@@ -4,6 +4,7 @@ import com.bazario.inventory.adapters.in.web.dto.InventoryDtos;
 import com.bazario.inventory.adapters.in.web.dto.InventoryWebMapper;
 import com.bazario.inventory.domain.model.Inventory;
 import com.bazario.inventory.ports.in.InventoryUseCase;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class InventoryController {
 
     @PostMapping("/initialize")
     public ResponseEntity<InventoryDtos.InventoryResponse> initializeInventory(
-            @RequestBody InventoryDtos.InitializeInventoryRequest request) {
+            @Valid @RequestBody InventoryDtos.InitializeInventoryRequest request) {
         Inventory inventory = inventoryUseCase.initializeInventory(request.productId(), request.initialStock(), request.lowStockThreshold());
         return ResponseEntity.ok(webMapper.toResponse(inventory));
     }
@@ -28,7 +29,7 @@ public class InventoryController {
     @PatchMapping("/{productId}/stock")
     public ResponseEntity<InventoryDtos.InventoryResponse> updateStock(
             @PathVariable UUID productId,
-            @RequestBody InventoryDtos.UpdateStockRequest request) {
+            @Valid @RequestBody InventoryDtos.UpdateStockRequest request) {
         inventoryUseCase.updateStock(productId, request.quantityChange());
         return inventoryUseCase.getInventoryByProductId(productId)
                 .map(webMapper::toResponse)
