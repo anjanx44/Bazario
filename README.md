@@ -29,6 +29,11 @@ Explore our detailed documentation to get started:
 
 Refer to the **[Onboarding Guide](docs/onboarding-guide.md)** for detailed instructions on setting up your local environment.
 
+## Contributing
+
+Want to contribute? Read **[CONTRIBUTING.md](CONTRIBUTING.md)** — it covers the branching strategy (`main` is always green, short-lived `feature/fix/docs/…` branches merged via PR), branch naming, commit message conventions, and the pull-request requirements.
+
+
 ---
 
 ## 📐 System Architecture & Documentation
