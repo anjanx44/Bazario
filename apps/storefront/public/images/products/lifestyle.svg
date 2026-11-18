@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800" role="img" aria-label="Lifestyle">
+  <rect width="800" height="800" fill="#0969da" fill-opacity="0.12"/>
+  <rect x="240" y="240" width="320" height="320" rx="40" fill="#0969da" fill-opacity="0.35"/>
+  <circle cx="400" cy="400" r="70" fill="#0969da"/>
+  <text x="400" y="650" font-family="Arial, sans-serif" font-size="36" text-anchor="middle" fill="#0969da">Lifestyle</text>
+</svg>

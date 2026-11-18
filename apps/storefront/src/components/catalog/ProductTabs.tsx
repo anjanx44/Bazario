@@ -29,7 +29,7 @@ export const ProductTabs = () => {
           </div>
           <div className="relative aspect-video rounded-2xl overflow-hidden shadow-xl border border-gray-200">
             <Image
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaFPVcjmQk6wwVbzCppn59KRIgJhhnYqIt3iY0gtRc4bTjj2n__mZo6iRZq6lfBys-nG7ECkpuSasymdiWTGq53owVFSyTi721Ar3cdZUDwMUHrHjXzyzA721k08RQvijPKnJc6cvCQqKx-sCfAQc6bTFBpFqSo5jT7VDRuPGp6a18nY4wydYeGo3-SqN4-ZsFVy52AErHJ9BMdi67hI1tMkAp88MCvTjfL3pa2Z_7H1AtQCzvgFj2nkSwP7Gqs4xa0ImfYmnAi9Y"
+              src="/images/products/lifestyle.svg"
               alt="Lifestyle image"
               fill
               className="object-cover"
