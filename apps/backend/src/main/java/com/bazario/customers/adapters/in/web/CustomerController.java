@@ -5,6 +5,7 @@ import com.bazario.customers.adapters.in.web.dto.CustomerWebMapper;
 import com.bazario.customers.domain.model.Customer;
 import com.bazario.customers.domain.model.CustomerAddress;
 import com.bazario.customers.ports.in.CustomerUseCase;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class CustomerController {
 
     @PostMapping("/register")
     public ResponseEntity<CustomerDtos.CustomerResponse> register(
-            @RequestBody CustomerDtos.RegisterRequest request) {
+            @Valid @RequestBody CustomerDtos.RegisterRequest request) {
         Customer customer = webMapper.toDomain(request);
         UUID customerId = customerUseCase.registerCustomer(customer);
         Customer registeredCustomer = customerUseCase.getCustomerById(customerId)
@@ -40,7 +41,7 @@ public class CustomerController {
     @PostMapping("/{id}/addresses")
     public ResponseEntity<CustomerDtos.AddressResponse> addAddress(
             @PathVariable UUID id,
-            @RequestBody CustomerDtos.AddressRequest request) {
+            @Valid @RequestBody CustomerDtos.AddressRequest request) {
         CustomerAddress address = webMapper.toAddressDomain(request);
         CustomerAddress savedAddress = customerUseCase.addAddress(id, address);
         return ResponseEntity.ok(webMapper.toAddressResponse(savedAddress));

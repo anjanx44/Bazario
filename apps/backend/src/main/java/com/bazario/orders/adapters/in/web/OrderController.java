@@ -4,6 +4,7 @@ import com.bazario.orders.adapters.in.web.dto.OrderDtos;
 import com.bazario.orders.adapters.in.web.dto.OrderWebMapper;
 import com.bazario.orders.domain.model.Order;
 import com.bazario.orders.ports.in.OrderUseCase;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class OrderController {
     private final OrderWebMapper webMapper;
 
     @PostMapping
-    public ResponseEntity<OrderDtos.OrderResponse> createOrder(@RequestBody OrderDtos.CreateOrderRequest request) {
+    public ResponseEntity<OrderDtos.OrderResponse> createOrder(@Valid @RequestBody OrderDtos.CreateOrderRequest request) {
         Order order = webMapper.toDomain(request);
         UUID orderId = orderUseCase.createOrder(order);
         Order savedOrder = orderUseCase.getOrderById(orderId)
