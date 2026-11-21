@@ -29,6 +29,36 @@ Explore our detailed documentation to get started:
 
 Refer to the **[Onboarding Guide](docs/onboarding-guide.md)** for detailed instructions on setting up your local environment.
 
+### Kafka locally (KRaft, no Zookeeper)
+
+Kafka is part of the local stack so the outbox pipeline (`orders.placed`) can be exercised before any domain code publishes events.
+
+```bash
+# 1. start postgres + kafka
+docker compose up -d
+
+# 2. create the topic once (replication factor 1, dev defaults)
+docker exec bazario-kafka /opt/kafka/bin/kafka-topics.sh \
+  --bootstrap-server localhost:9092 \
+  --create --if-not-exists \
+  --topic orders.placed \
+  --partitions 1 --replication-factor 1
+
+# 3. it exists
+docker exec bazario-kafka /opt/kafka/bin/kafka-topics.sh \
+  --bootstrap-server localhost:9092 --list
+
+# 4. smoke roundtrip (one terminal produces, another consumes)
+docker exec -it bazario-kafka /opt/kafka/bin/kafka-console-producer.sh \
+  --bootstrap-server localhost:9092 --topic orders.placed
+# type a line, e.g. {"orderId":"1a2b","status":"PLACED"}
+
+docker exec -it bazario-kafka /opt/kafka/bin/kafka-console-consumer.sh \
+  --bootstrap-server localhost:9092 --topic orders.placed --from-beginning
+```
+
+Bootstrap servers used by the app: `localhost:9092` (override with `KAFKA_BOOTSTRAP_SERVERS`). Containers on the compose network use `kafka:29092`. Topic auto-creation is disabled on purpose, so `orders.placed` must be created before a producer or consumer touches it.
+
 ## Contributing
 
 Want to contribute? Read **[CONTRIBUTING.md](CONTRIBUTING.md)** — it covers the branching strategy (`main` is always green, short-lived `feature/fix/docs/…` branches merged via PR), branch naming, commit message conventions, and the pull-request requirements.

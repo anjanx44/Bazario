@@ -33,6 +33,22 @@ spring:
     validate-on-migrate: ${FLYWAY_VALIDATE_ON_MIGRATE:true}
     out-of-order: ${FLYWAY_OUT_OF_ORDER:false}
 
+  # Local Kafka (docker-compose.yaml, KRaft mode). Topic: orders.placed
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP:bazario}
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      missing-topics-fatal: false
+
 api:
   info:
     title: Bazario API
