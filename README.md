@@ -65,6 +65,15 @@ Bootstrap servers used by the app: `localhost:9092` (override with `KAFKA_BOOTST
 > (the `dev` profile adds it automatically). Scraping Prometheus in a non-dev profile requires
 > authentication or a separate management port.
 
+### Running the backend tests
+
+The backend tests start a disposable PostgreSQL container through Testcontainers, so a running Docker daemon is required. No local database has to be prepared.
+
+```bash
+cd apps/backend
+./mvnw test
+```
+
 ## Contributing
 
 Want to contribute? Read **[CONTRIBUTING.md](CONTRIBUTING.md)** — it covers the branching strategy (`main` is always green, short-lived `feature/fix/docs/…` branches merged via PR), branch naming, commit message conventions, and the pull-request requirements.
