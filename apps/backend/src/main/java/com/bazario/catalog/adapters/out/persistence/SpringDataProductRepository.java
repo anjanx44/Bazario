@@ -16,21 +16,28 @@ public interface SpringDataProductRepository extends JpaRepository<ProductJpaEnt
     Optional<ProductJpaEntity> findBySlug(String slug);
     Optional<ProductJpaEntity> findBySku(String sku);
 
-    @Modifying
+    // clearAutomatically/flushAutomatically: a bulk UPDATE bypasses the persistence context,
+    // so without clearing it a later findById() inside the same transaction returns stale data.
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE ProductJpaEntity p SET p.active = false WHERE p.id = :id")
     void deactivateById(@Param("id") UUID id);
 
     /**
      * Paginated storefront query — only active products.
      * All filter params are optional (pass null to skip).
+     *
+     * CAST(:search AS string) is required on PostgreSQL: a null parameter has no
+     * inferred type, so LOWER(null-param) resolves to lower(bytea) and the query
+     * fails at runtime whenever the search box is empty.
      */
     @Query("""
             SELECT p FROM ProductJpaEntity p
             LEFT JOIN p.category c
             WHERE p.active = true
               AND (:categorySlug IS NULL OR c.slug = :categorySlug)
-              AND (:search      IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%'))
-                                       OR LOWER(p.description) LIKE LOWER(CONCAT('%', :search, '%')))
+              AND (CAST(:search AS string) IS NULL
+                   OR LOWER(p.name)        LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+                   OR LOWER(p.description) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')))
               AND (:minPrice    IS NULL OR p.basePrice >= :minPrice)
               AND (:maxPrice    IS NULL OR p.basePrice <= :maxPrice)
             """)
