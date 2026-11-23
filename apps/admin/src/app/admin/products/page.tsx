@@ -22,7 +22,7 @@ const products = [
     price: '$299.00', 
     stock: 45, 
     status: 'In Stock',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDsNhCQBBA6b5RUM1vjvUGW0MCUcepD12fgWo3Mu5DHTtcp-gpkMy77cbW8wSNfB711jz0u2u_KpiyggyifdhmitO6I_3BvN5Kd9mBuNI-BqTYFHw06BAGTOYo4Ug01iAMLtPKyQJxOEyIWUxrwxH80Uct8_mcfVBp2tEci2v8Ol0wwUOqRZ-f8Rg8YySykTSNVij7QkphlJc185N1cHVEIcLIi4zlCBZnMYqSIKXS4UBTKm8hHK61uH9s_BXfxCuPbWDMPGnkhHNM'
+    image: '/images/products/aerosound-elite-5.svg'
   },
   { 
     id: '2', 
@@ -32,7 +32,7 @@ const products = [
     price: '$199.00', 
     stock: 12, 
     status: 'Low Stock',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCV54dkcMWwkMVBAqreY0UrmEIpcahUQn8gKhFq4YmBIi4IsuZvma6rp2juT2UBotGnR2bX7_u8zP2FDxaLUwc4WBSnNgDHoLm_rifzJ-hJLjTUDDHOoGQT6hlV4vtEkqXEIvy11YGAtekJum2QlBnV45yTqFMKfNFohLW92ldqFxoBgcHejEEDkbCH5_U3e6zwPCLdB1u1ixu0bGDWrRe_GTQrWRPuoNGazGKuTNpw1DVX1_oDQNeHu3pdUYPfnMMxq-PqaDxS7qU'
+    image: '/images/products/smart-watch-pro.svg'
   },
   { 
     id: '3', 
@@ -42,7 +42,7 @@ const products = [
     price: '$89.00', 
     stock: 0, 
     status: 'Out of Stock',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCewHoZeMQQEdBscS5Zz0-7GLBG8fQZMP2ZGmFLyvYUw1YgrzKcE6OiDGaEH6o9hhSCt_XXasINKhOTS8cPjMJ8-QNEHsd3c0vCpIju56rXwrbSI652k_rK7E39mckVRLonUZVWVDDV51BVWSYf62ka3qrpflQc7A-mFC60Y3TKJZlonHSbVnjI_mQy2vGSY3hN7PrTszbariSuKn28_yZjAWObv79ge_PfhdcOudpon6RKu1vFHzRzcaFQixJNSq9GJ_RCTE30t-E'
+    image: '/images/products/leather-laptop-bag.svg'
   },
 ];
 

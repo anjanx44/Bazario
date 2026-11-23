@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800" role="img" aria-label="titan-mesh-router placeholder">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#042f2e"/>
+      <stop offset="1" stop-color="#2dd4bf"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#g)"/>
+  <g>
+    <rect x="230" y="400" width="340" height="90" rx="20" fill="#ffffff" opacity="0.92"/>
+    <path d="M300 400 v-90 M400 400 v-130 M500 400 v-90" stroke="#ffffff" stroke-width="16" stroke-linecap="round" opacity="0.8"/>
+    <circle cx="300" cy="445" r="12" fill="#111827" opacity="0.7"/>
+    <circle cx="350" cy="445" r="12" fill="#111827" opacity="0.7"/></g>
+</svg>
