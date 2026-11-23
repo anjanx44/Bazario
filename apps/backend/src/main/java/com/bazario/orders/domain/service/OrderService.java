@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -102,8 +101,8 @@ public class OrderService implements OrderUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Order> getOrdersByCustomerId(UUID customerId) {
-        return orderRepositoryPort.findByCustomerId(customerId);
+    public Page<Order> getOrdersByCustomerId(UUID customerId, Pageable pageable) {
+        return orderRepositoryPort.findByCustomerId(customerId, pageable);
     }
 
     @Override

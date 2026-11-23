@@ -4,6 +4,8 @@ import com.bazario.customers.domain.model.Customer;
 import com.bazario.customers.domain.model.CustomerAddress;
 import com.bazario.customers.ports.out.CustomerRepositoryPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -59,5 +61,11 @@ public class PostgresCustomerAdapter implements CustomerRepositoryPort {
     public List<CustomerAddress> findAddressesByCustomerId(UUID customerId) {
         List<CustomerAddressJpaEntity> entities = addressRepository.findByCustomerId(customerId);
         return mapper.toAddressDomainList(entities);
+    }
+
+    @Override
+    public Page<CustomerAddress> findAddressesByCustomerId(UUID customerId, Pageable pageable) {
+        return addressRepository.findByCustomerId(customerId, pageable)
+                .map(mapper::toAddressDomain);
     }
 }

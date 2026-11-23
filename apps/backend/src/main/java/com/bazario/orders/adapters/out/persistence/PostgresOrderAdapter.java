@@ -8,10 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -33,10 +31,8 @@ public class PostgresOrderAdapter implements OrderRepositoryPort {
     }
 
     @Override
-    public List<Order> findByCustomerId(UUID customerId) {
-        return repository.findByCustomerId(customerId).stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
+    public Page<Order> findByCustomerId(UUID customerId, Pageable pageable) {
+        return repository.findByCustomerId(customerId, pageable).map(mapper::toDomain);
     }
 
     @Override

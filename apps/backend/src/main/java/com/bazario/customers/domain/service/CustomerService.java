@@ -6,6 +6,8 @@ import com.bazario.customers.ports.in.CustomerUseCase;
 import com.bazario.customers.ports.out.CustomerRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,5 +80,11 @@ public class CustomerService implements CustomerUseCase {
     @Transactional(readOnly = true)
     public List<CustomerAddress> getAddressesByCustomerId(UUID customerId) {
         return customerRepositoryPort.findAddressesByCustomerId(customerId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<CustomerAddress> getAddressesByCustomerId(UUID customerId, Pageable pageable) {
+        return customerRepositoryPort.findAddressesByCustomerId(customerId, pageable);
     }
 }
