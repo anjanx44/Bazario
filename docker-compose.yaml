@@ -16,7 +16,7 @@ services:
   # Host access (app on your machine): localhost:9092
   # Container-to-container access:        kafka:29092
   kafka:
-    image: apache/kafka:3.9.1
+    image: apache/kafka:4.4.0
     container_name: bazario-kafka
     ports:
       - "9092:9092"
