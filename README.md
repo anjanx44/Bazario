@@ -59,6 +59,12 @@ docker exec -it bazario-kafka /opt/kafka/bin/kafka-console-consumer.sh \
 
 Bootstrap servers used by the app: `localhost:9092` (override with `KAFKA_BOOTSTRAP_SERVERS`). Containers on the compose network use `kafka:29092`. Topic auto-creation is disabled on purpose, so `orders.placed` must be created before a producer or consumer touches it.
 
+> **Profiles and metrics.** `application.yml` defaults to the `dev` profile so local runs work without extra flags.
+> A real deployment must set the profile explicitly, for example `SPRING_PROFILES_ACTIVE=prod`.
+> Non-dev profiles expose only `health,info`; add Prometheus with `MANAGEMENT_EXPOSURE=health,info,prometheus`
+> (the `dev` profile adds it automatically). Scraping Prometheus in a non-dev profile requires
+> authentication or a separate management port.
+
 ## Contributing
 
 Want to contribute? Read **[CONTRIBUTING.md](CONTRIBUTING.md)** — it covers the branching strategy (`main` is always green, short-lived `feature/fix/docs/…` branches merged via PR), branch naming, commit message conventions, and the pull-request requirements.

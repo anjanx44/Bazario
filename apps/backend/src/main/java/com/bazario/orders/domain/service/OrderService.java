@@ -42,6 +42,7 @@ public class OrderService implements OrderUseCase {
     public UUID createOrder(Order order) {
         // Measured around the whole use case: validation, pricing, stock and persistence.
         Timer.Sample sample = orderMetrics.startCreateTimer();
+        boolean success = false;
         try {
             log.info("Placing new order for customer: {}", order.getCustomerId());
 
@@ -83,11 +84,13 @@ public class OrderService implements OrderUseCase {
 
             // 5. Save Order
             UUID orderId = orderRepositoryPort.save(order).getId();
+            // Only counts once the transaction commits, so a commit-time rollback is not counted.
             orderMetrics.incrementPlaced();
+            success = true;
             return orderId;
         } finally {
-            // Failures are recorded too: a slow failure still shows up in the metric.
-            orderMetrics.stopCreateTimer(sample);
+            // Failures are recorded too (with outcome=failure): a slow failure still shows up.
+            orderMetrics.stopCreateTimer(sample, success);
         }
     }
 

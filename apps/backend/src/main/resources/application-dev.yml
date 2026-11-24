@@ -65,23 +65,10 @@ springdoc:
     enabled: ${SPRINGDOC_SWAGGER_ENABLED:true}
 
 # Actuator / Micrometer
-# Metrics are exposed on dev only. Other profiles keep the Boot default (health only),
-# which is what keeps /actuator/prometheus unreachable in prod.
+# Dev only: expose Prometheus so a local scrape works out of the box.
+# Everything else (probe groups, show-details, default exposure) lives in application.yml.
 management:
   endpoints:
     web:
       exposure:
         include: health,info,prometheus
-  endpoint:
-    health:
-      show-details: always
-      probes:
-        enabled: true
-      group:
-        # Liveness must not depend on external systems: a DB outage must not restart the app.
-        liveness:
-          include: livenessState,ping
-        # Readiness fails when a dependency is down, so traffic is routed away.
-        # "kafka" joins this group once spring-kafka lands on main (see issue #34).
-        readiness:
-          include: readinessState,db
