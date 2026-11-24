@@ -15,6 +15,34 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    # Integration tests connect to localhost:5432/bazario_dev_db (see
+    # application-dev.yml and the @SpringBootTest properties in src/test).
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: bazario_dev_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d bazario_dev_db"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      TEST_DB_URL: jdbc:postgresql://localhost:5432/bazario_dev_db
+      TEST_DB_USERNAME: postgres
+      TEST_DB_PASSWORD: postgres
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_NAME: bazario_dev_db
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
