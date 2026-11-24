@@ -166,7 +166,7 @@ function mapApiProductToProduct(api: ProductApiResponse): Product {
     sku: api.sku,
     active: api.active,
     imageUrl: api.imageUrl ?? '/images/products/placeholder.svg',
-    images: api.images,
+    images: api.images?.length ? api.images : [api.imageUrl ?? '/images/products/placeholder.svg'],
     rating: api.rating ?? 0,
     reviewsCount: api.reviewsCount ?? 0,
     discountPercentage: api.discountPercentage,
