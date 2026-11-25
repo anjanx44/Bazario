@@ -6,6 +6,7 @@ import com.bazario.orders.domain.model.OrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,7 +25,10 @@ public interface OrderUseCase {
 
     Optional<Order> getOrderById(UUID id);
 
-    /** Paginated order list for a single customer. */
+    /** All orders of a customer, unpaged: the legacy v1 list contract. */
+    List<Order> getOrdersByCustomerId(UUID customerId);
+
+    /** Paginated order list for a single customer (v2). */
     Page<Order> getOrdersByCustomerId(UUID customerId, Pageable pageable);
 
     /**

@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Paging contract of {@code GET /api/v1/customers/{id}/addresses}:
+ * Paging contract of {@code GET /api/v2/customers/{id}/addresses}:
  * default size, custom size, the size ceiling, and an empty page.
  */
 class CustomerControllerPaginationTest {
@@ -49,7 +49,7 @@ class CustomerControllerPaginationTest {
                         UUID.randomUUID(), CUSTOMER_ID, "1 Main St", null, "Nanjing",
                         "210000", "CN", true, null));
 
-        mockMvc = MockMvcBuilders.standaloneSetup(new CustomerController(customerUseCase, webMapper))
+        mockMvc = MockMvcBuilders.standaloneSetup(new CustomerPaginationController(customerUseCase, webMapper))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }
@@ -66,9 +66,10 @@ class CustomerControllerPaginationTest {
     void defaultsToFirstPageOfTwentyNewestFirst() throws Exception {
         stubAddressesPage(41);
 
-        mockMvc.perform(get("/api/v1/customers/{id}/addresses", CUSTOMER_ID))
+        mockMvc.perform(get("/api/v2/customers/{id}/addresses", CUSTOMER_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.page").value(0))
+                .andExpect(jsonPath("$.number").value(0))
                 .andExpect(jsonPath("$.size").value(20))
                 .andExpect(jsonPath("$.totalElements").value(41))
                 .andExpect(jsonPath("$.totalPages").value(3))
@@ -85,12 +86,13 @@ class CustomerControllerPaginationTest {
     void honoursAnExplicitPageAndSize() throws Exception {
         stubAddressesPage(41);
 
-        mockMvc.perform(get("/api/v1/customers/{id}/addresses", CUSTOMER_ID)
+        mockMvc.perform(get("/api/v2/customers/{id}/addresses", CUSTOMER_ID)
                         .param("page", "2")
                         .param("size", "10")
                         .param("sort", "city,asc"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.page").value(2))
+                .andExpect(jsonPath("$.number").value(2))
                 .andExpect(jsonPath("$.size").value(10))
                 .andExpect(jsonPath("$.totalPages").value(5));
 
@@ -104,7 +106,7 @@ class CustomerControllerPaginationTest {
     void clampsSizeAtOneHundred() throws Exception {
         stubAddressesPage(250);
 
-        mockMvc.perform(get("/api/v1/customers/{id}/addresses", CUSTOMER_ID)
+        mockMvc.perform(get("/api/v2/customers/{id}/addresses", CUSTOMER_ID)
                         .param("size", "500"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size").value(100))
@@ -121,7 +123,7 @@ class CustomerControllerPaginationTest {
                 .thenAnswer(invocation -> new PageImpl<CustomerAddress>(
                         List.of(), invocation.getArgument(1), 0));
 
-        mockMvc.perform(get("/api/v1/customers/{id}/addresses", CUSTOMER_ID))
+        mockMvc.perform(get("/api/v2/customers/{id}/addresses", CUSTOMER_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(0)))
                 .andExpect(jsonPath("$.totalElements").value(0))
@@ -130,7 +132,7 @@ class CustomerControllerPaginationTest {
 
     @Test
     void rejectsASizeBelowOne() throws Exception {
-        mockMvc.perform(get("/api/v1/customers/{id}/addresses", CUSTOMER_ID)
+        mockMvc.perform(get("/api/v2/customers/{id}/addresses", CUSTOMER_ID)
                         .param("size", "0"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", containsString("size")));

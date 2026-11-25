@@ -5,6 +5,8 @@ import com.bazario.customers.domain.model.CustomerAddress;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface CustomerWebMapper {
 
@@ -24,5 +26,7 @@ public interface CustomerWebMapper {
     CustomerDtos.CustomerResponse toResponse(Customer domain);
 
     CustomerDtos.AddressResponse toAddressResponse(CustomerAddress domain);
+
+    List<CustomerDtos.AddressResponse> toAddressResponseList(List<CustomerAddress> addresses);
 
 }

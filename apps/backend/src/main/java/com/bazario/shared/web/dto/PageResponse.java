@@ -7,17 +7,19 @@ import java.util.List;
 /**
  * Envelope returned by every paginated list endpoint of the public API, so
  * clients always read the same shape:
- * {@code {content, page, size, totalElements, totalPages}}.
+ * {@code {content, page, number, size, totalElements, totalPages}}.
  *
- * <p>The catalog and admin endpoints predate this record and still expose the
- * Spring Data field name {@code number} instead of {@code page}; they are
- * intentionally left untouched (changing them would break existing clients).
+ * <p>The catalog and admin endpoints predate this record and expose the
+ * Spring Data field name {@code number}; this envelope carries both {@code page}
+ * and {@code number} (same value) so a client built against either naming keeps
+ * working without a second migration.
  *
  * @param <T> type of the elements in {@code content}
  */
 public record PageResponse<T>(
         List<T> content,
         int page,
+        int number,
         int size,
         long totalElements,
         int totalPages
@@ -27,6 +29,7 @@ public record PageResponse<T>(
     public static <T> PageResponse<T> of(Page<T> pagedResult) {
         return new PageResponse<>(
                 pagedResult.getContent(),
+                pagedResult.getNumber(),
                 pagedResult.getNumber(),
                 pagedResult.getSize(),
                 pagedResult.getTotalElements(),

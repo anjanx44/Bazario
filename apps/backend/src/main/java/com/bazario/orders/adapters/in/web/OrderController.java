@@ -4,26 +4,18 @@ import com.bazario.orders.adapters.in.web.dto.OrderDtos;
 import com.bazario.orders.adapters.in.web.dto.OrderWebMapper;
 import com.bazario.orders.domain.model.Order;
 import com.bazario.orders.ports.in.OrderUseCase;
-import com.bazario.shared.web.PageRequests;
-import com.bazario.shared.web.dto.PageResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
 public class OrderController {
-
-    /** Order fields that may be used as the {@code sort} query parameter. */
-    private static final Set<String> ORDER_SORTABLE_PROPERTIES =
-            Set.of("createdAt", "updatedAt", "orderNumber", "totalAmount", "status");
 
     private final OrderUseCase orderUseCase;
     private final OrderWebMapper webMapper;
@@ -46,20 +38,14 @@ public class OrderController {
     }
 
     /**
-     * Paginated order list for a single customer.
+     * Legacy v1 order list for a single customer: a plain JSON array, no paging.
      *
-     * Query parameters: {@code page} (default 0), {@code size} (default 20, max 100),
-     * {@code sort} (default {@code createdAt,desc}).
-     * Response: {@code {content[], page, size, totalElements, totalPages}}.
+     * <p>Kept unchanged on purpose - existing storefront and admin clients read
+     * this shape. The paginated envelope lives on {@code GET /api/v2/orders/customer/{customerId}}.
      */
     @GetMapping("/customer/{customerId}")
-    public ResponseEntity<PageResponse<OrderDtos.OrderResponse>> getOrdersByCustomerId(
-            @PathVariable UUID customerId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "createdAt,desc") String sort) {
-        Pageable pageable = PageRequests.of(page, size, sort, ORDER_SORTABLE_PROPERTIES);
-        Page<Order> orders = orderUseCase.getOrdersByCustomerId(customerId, pageable);
-        return ResponseEntity.ok(PageResponse.of(orders.map(webMapper::toResponse)));
+    public ResponseEntity<List<OrderDtos.OrderResponse>> getOrdersByCustomerId(@PathVariable UUID customerId) {
+        List<Order> orders = orderUseCase.getOrdersByCustomerId(customerId);
+        return ResponseEntity.ok(webMapper.toResponseList(orders));
     }
 }

@@ -5,26 +5,18 @@ import com.bazario.customers.adapters.in.web.dto.CustomerWebMapper;
 import com.bazario.customers.domain.model.Customer;
 import com.bazario.customers.domain.model.CustomerAddress;
 import com.bazario.customers.ports.in.CustomerUseCase;
-import com.bazario.shared.web.PageRequests;
-import com.bazario.shared.web.dto.PageResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/customers")
 @RequiredArgsConstructor
 public class CustomerController {
-
-    /** Address fields that may be used as the {@code sort} query parameter. */
-    private static final Set<String> ADDRESS_SORTABLE_PROPERTIES =
-            Set.of("createdAt", "city", "postalCode", "country");
 
     private final CustomerUseCase customerUseCase;
     private final CustomerWebMapper webMapper;
@@ -56,20 +48,14 @@ public class CustomerController {
     }
 
     /**
-     * Paginated address list.
+     * Legacy v1 address list: a plain JSON array, no paging.
      *
-     * Query parameters: {@code page} (default 0), {@code size} (default 20, max 100),
-     * {@code sort} (default {@code createdAt,desc}).
-     * Response: {@code {content[], page, size, totalElements, totalPages}}.
+     * <p>Kept unchanged on purpose. The paginated envelope lives on
+     * {@code GET /api/v2/customers/{id}/addresses}.
      */
     @GetMapping("/{id}/addresses")
-    public ResponseEntity<PageResponse<CustomerDtos.AddressResponse>> getAddresses(
-            @PathVariable UUID id,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "createdAt,desc") String sort) {
-        Pageable pageable = PageRequests.of(page, size, sort, ADDRESS_SORTABLE_PROPERTIES);
-        Page<CustomerAddress> addresses = customerUseCase.getAddressesByCustomerId(id, pageable);
-        return ResponseEntity.ok(PageResponse.of(addresses.map(webMapper::toAddressResponse)));
+    public ResponseEntity<List<CustomerDtos.AddressResponse>> getAddresses(@PathVariable UUID id) {
+        List<CustomerAddress> addresses = customerUseCase.getAddressesByCustomerId(id);
+        return ResponseEntity.ok(webMapper.toAddressResponseList(addresses));
     }
 }

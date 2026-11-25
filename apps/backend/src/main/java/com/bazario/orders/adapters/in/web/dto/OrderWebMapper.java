@@ -5,10 +5,14 @@ import com.bazario.orders.domain.model.OrderItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface OrderWebMapper {
 
     OrderDtos.OrderResponse toResponse(Order order);
+
+    List<OrderDtos.OrderResponse> toResponseList(List<Order> orders);
 
     OrderDtos.OrderItemResponse toItemResponse(OrderItem item);
 
