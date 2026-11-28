@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800" role="img" aria-label="headphone-stand placeholder">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#27272a"/>
+      <stop offset="1" stop-color="#a1a1aa"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#g)"/>
+  <g>
+    <rect x="386" y="250" width="28" height="240" rx="14" fill="#ffffff" opacity="0.9"/>
+    <path d="M300 500 h200" stroke="#ffffff" stroke-width="26" stroke-linecap="round" opacity="0.9"/>
+    <path d="M330 500 q70 40 140 0" fill="none" stroke="#ffffff" stroke-width="14" opacity="0.6"/></g>
+</svg>
