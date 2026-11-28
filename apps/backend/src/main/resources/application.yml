@@ -36,7 +36,8 @@ management:
           include: livenessState,ping
           show-details: never
         # Readiness fails when a dependency is down, so traffic is routed away.
-        # "kafka" joins this group once spring-kafka lands on main (see issue #34).
+        # Spring Boot 4.0 has no built-in kafka health contributor, so a custom
+        # indicator is needed before Kafka can join this group (separate issue).
         readiness:
           include: readinessState,db
           show-details: never
