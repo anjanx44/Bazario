@@ -14,6 +14,11 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
  * Subclasses only need:
  *   @DataJpaTest
  *   @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+ *
+ * Shared-schema discipline: one container and one Flyway schema are shared by
+ * every test context. @DataJpaTest rolls back after each test, but a future test
+ * that commits (for example @SpringBootTest without @Transactional) MUST clean
+ * up the rows it inserted, or later tests will see them.
  */
 public abstract class AbstractPostgresTest {
 
