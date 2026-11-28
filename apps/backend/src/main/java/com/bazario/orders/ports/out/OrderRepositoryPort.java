@@ -13,6 +13,7 @@ public interface OrderRepositoryPort {
     Order save(Order order);
     Optional<Order> findById(UUID id);
     List<Order> findByCustomerId(UUID customerId);
+    Page<Order> findByCustomerId(UUID customerId, Pageable pageable);
 
     /** Admin: paginated order list with optional filters. */
     Page<Order> findAllOrders(

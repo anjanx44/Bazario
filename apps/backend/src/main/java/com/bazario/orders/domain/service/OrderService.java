@@ -108,6 +108,12 @@ public class OrderService implements OrderUseCase {
 
     @Override
     @Transactional(readOnly = true)
+    public Page<Order> getOrdersByCustomerId(UUID customerId, Pageable pageable) {
+        return orderRepositoryPort.findByCustomerId(customerId, pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Page<Order> listOrders(
             Pageable pageable,
             OrderStatus status,

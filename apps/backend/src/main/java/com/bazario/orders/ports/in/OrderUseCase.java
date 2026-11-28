@@ -25,7 +25,11 @@ public interface OrderUseCase {
 
     Optional<Order> getOrderById(UUID id);
 
+    /** All orders of a customer, unpaged: the legacy v1 list contract. */
     List<Order> getOrdersByCustomerId(UUID customerId);
+
+    /** Paginated order list for a single customer (v2). */
+    Page<Order> getOrdersByCustomerId(UUID customerId, Pageable pageable);
 
     /**
      * Admin: paginated order list with optional filters.

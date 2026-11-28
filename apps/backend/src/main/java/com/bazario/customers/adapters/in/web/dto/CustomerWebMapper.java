@@ -27,5 +27,6 @@ public interface CustomerWebMapper {
 
     CustomerDtos.AddressResponse toAddressResponse(CustomerAddress domain);
 
-    List<CustomerDtos.AddressResponse> toAddressResponseList(List<CustomerAddress> domains);
+    List<CustomerDtos.AddressResponse> toAddressResponseList(List<CustomerAddress> addresses);
+
 }

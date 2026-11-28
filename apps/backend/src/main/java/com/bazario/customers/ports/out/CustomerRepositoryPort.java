@@ -2,6 +2,8 @@ package com.bazario.customers.ports.out;
 
 import com.bazario.customers.domain.model.Customer;
 import com.bazario.customers.domain.model.CustomerAddress;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,4 +24,5 @@ public interface CustomerRepositoryPort {
     boolean updatePasswordIfUnchanged(UUID customerId, String expectedPasswordHash, String newPasswordHash);
     CustomerAddress saveAddress(CustomerAddress address);
     List<CustomerAddress> findAddressesByCustomerId(UUID customerId);
+    Page<CustomerAddress> findAddressesByCustomerId(UUID customerId, Pageable pageable);
 }

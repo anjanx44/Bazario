@@ -2,6 +2,8 @@ package com.bazario.customers.ports.in;
 
 import com.bazario.customers.domain.model.Customer;
 import com.bazario.customers.domain.model.CustomerAddress;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,5 +16,10 @@ public interface CustomerUseCase {
     Optional<Customer> getCustomerByEmail(String email);
     boolean changePasswordIfUnchanged(UUID customerId, String expectedPasswordHash, String newPassword);
     CustomerAddress addAddress(UUID customerId, CustomerAddress address);
+
+    /** All addresses of a customer, unpaged. Used internally when an order snapshots the default address. */
     List<CustomerAddress> getAddressesByCustomerId(UUID customerId);
+
+    /** Paginated address list for the public API. */
+    Page<CustomerAddress> getAddressesByCustomerId(UUID customerId, Pageable pageable);
 }

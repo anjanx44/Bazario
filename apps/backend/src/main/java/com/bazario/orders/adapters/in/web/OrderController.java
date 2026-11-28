@@ -37,6 +37,12 @@ public class OrderController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * Legacy v1 order list for a single customer: a plain JSON array, no paging.
+     *
+     * <p>Kept unchanged on purpose - existing storefront and admin clients read
+     * this shape. The paginated envelope lives on {@code GET /api/v2/orders/customer/{customerId}}.
+     */
     @GetMapping("/customer/{customerId}")
     public ResponseEntity<List<OrderDtos.OrderResponse>> getOrdersByCustomerId(@PathVariable UUID customerId) {
         List<Order> orders = orderUseCase.getOrdersByCustomerId(customerId);

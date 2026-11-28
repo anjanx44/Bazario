@@ -14,6 +14,8 @@ public interface SpringDataOrderRepository extends JpaRepository<OrderJpaEntity,
 
     List<OrderJpaEntity> findByCustomerId(UUID customerId);
 
+    Page<OrderJpaEntity> findByCustomerId(UUID customerId, Pageable pageable);
+
     long countByStatus(OrderStatus status);
 
     @Query("""

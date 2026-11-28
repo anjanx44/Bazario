@@ -47,6 +47,12 @@ public class CustomerController {
         return ResponseEntity.ok(webMapper.toAddressResponse(savedAddress));
     }
 
+    /**
+     * Legacy v1 address list: a plain JSON array, no paging.
+     *
+     * <p>Kept unchanged on purpose. The paginated envelope lives on
+     * {@code GET /api/v2/customers/{id}/addresses}.
+     */
     @GetMapping("/{id}/addresses")
     public ResponseEntity<List<CustomerDtos.AddressResponse>> getAddresses(@PathVariable UUID id) {
         List<CustomerAddress> addresses = customerUseCase.getAddressesByCustomerId(id);
