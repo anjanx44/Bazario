@@ -1,5 +1,6 @@
 package com.bazario.auth.adapters.out.persistence;
 
+import com.bazario.AbstractPostgresTest;
 import com.bazario.BazarioApplication;
 import com.bazario.auth.domain.model.RefreshToken;
 import com.bazario.auth.domain.service.JwtService;
@@ -38,12 +39,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(
         classes = BazarioApplication.class,
         properties = {
-                "security.jwt.secret=AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
-                "spring.datasource.url=${TEST_DB_URL:jdbc:postgresql://localhost:5432/bazario_dev_db}",
-                "spring.datasource.username=${TEST_DB_USERNAME:postgres}",
-                "spring.datasource.password=${TEST_DB_PASSWORD:postgres}"
+                "security.jwt.secret=AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8="
         })
-class RefreshTokenPersistenceIntegrationTest {
+class RefreshTokenPersistenceIntegrationTest extends AbstractPostgresTest {
 
     @Autowired
     private RefreshTokenService refreshTokenService;
