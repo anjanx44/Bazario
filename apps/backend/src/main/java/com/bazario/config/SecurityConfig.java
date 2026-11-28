@@ -4,6 +4,8 @@ import com.bazario.auth.domain.service.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -63,7 +65,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             CorsConfigurationSource corsConfigurationSource,
-            JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            Environment environment) throws Exception {
 
         http
             // Disable CSRF — stateless JWT API
@@ -83,24 +86,34 @@ public class SecurityConfig {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN)))
 
             // Authorization rules
-            .authorizeHttpRequests(auth -> auth
-                // Public storefront catalog
-                .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
-                // Public auth endpoints
-                .requestMatchers("/api/v1/auth/login").permitAll()
-                .requestMatchers("/api/v1/auth/register").permitAll()
-                .requestMatchers("/api/v1/auth/refresh").permitAll()
-                .requestMatchers("/api/v1/auth/forgot-password").permitAll()
-                .requestMatchers("/api/v1/auth/reset-password").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/auth/me").authenticated()
-                // OpenAPI / Swagger UI
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                // Admin portal — requires ADMIN role
-                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                // Everything else requires authentication
-                .anyRequest().authenticated()
-            );
+            .authorizeHttpRequests(auth -> {
+                // Orchestrator probes: no credentials, must be anonymous in every profile
+                auth.requestMatchers("/actuator/health", "/actuator/health/**").permitAll();
+
+                // Metrics scrape target: dev only. In prod the endpoint is not exposed at all
+                // (see management.endpoints.web.exposure.include), so it 404s regardless.
+                if (environment.acceptsProfiles(Profiles.of("dev"))) {
+                    auth.requestMatchers("/actuator/prometheus").permitAll();
+                }
+
+                auth
+                    // Public storefront catalog
+                    .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
+                    // Public auth endpoints
+                    .requestMatchers("/api/v1/auth/login").permitAll()
+                    .requestMatchers("/api/v1/auth/register").permitAll()
+                    .requestMatchers("/api/v1/auth/refresh").permitAll()
+                    .requestMatchers("/api/v1/auth/forgot-password").permitAll()
+                    .requestMatchers("/api/v1/auth/reset-password").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/v1/auth/me").authenticated()
+                    // OpenAPI / Swagger UI
+                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                    // Admin portal — requires ADMIN role
+                    .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                    // Everything else requires authentication
+                    .anyRequest().authenticated();
+            });
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

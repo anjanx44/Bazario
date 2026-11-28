@@ -12,3 +12,32 @@ security:
     refresh-ttl: ${JWT_REFRESH_TTL:PT24H}
     remembered-refresh-ttl: ${JWT_REMEMBERED_REFRESH_TTL:P30D}
     reset-ttl: ${JWT_RESET_TTL:PT15M}
+
+# Actuator / Micrometer
+# Common config for every profile: probe groups plus a safe health endpoint.
+# Prometheus is NOT exposed here. Opt in explicitly, e.g.
+#   MANAGEMENT_EXPOSURE=health,info,prometheus
+# (the dev profile below does that for local scrapes).
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${MANAGEMENT_EXPOSURE:health,info}
+  endpoint:
+    health:
+      # The probe endpoint is anonymous, so never leak internal details such as
+      # database error messages to it.
+      show-details: never
+      probes:
+        enabled: true
+      group:
+        # Liveness must not depend on external systems: a DB outage must not restart the app.
+        liveness:
+          include: livenessState,ping
+          show-details: never
+        # Readiness fails when a dependency is down, so traffic is routed away.
+        # Spring Boot 4.0 has no built-in kafka health contributor, so a custom
+        # indicator is needed before Kafka can join this group (separate issue).
+        readiness:
+          include: readinessState,db
+          show-details: never

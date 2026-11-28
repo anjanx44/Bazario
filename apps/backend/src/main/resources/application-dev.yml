@@ -63,3 +63,12 @@ springdoc:
   swagger-ui:
     path: ${SPRINGDOC_SWAGGER_UI_PATH:/swagger-ui.html}
     enabled: ${SPRINGDOC_SWAGGER_ENABLED:true}
+
+# Actuator / Micrometer
+# Dev only: expose Prometheus so a local scrape works out of the box.
+# Everything else (probe groups, show-details, default exposure) lives in application.yml.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus

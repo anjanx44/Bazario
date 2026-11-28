@@ -11,6 +11,8 @@ import com.bazario.orders.domain.model.OrderItem;
 import com.bazario.orders.domain.model.OrderStatus;
 import com.bazario.orders.ports.in.OrderUseCase;
 import com.bazario.orders.ports.out.OrderRepositoryPort;
+import com.bazario.shared.metrics.OrderMetrics;
+import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -33,50 +35,63 @@ public class OrderService implements OrderUseCase {
     private final CustomerUseCase customerUseCase;
     private final ProductUseCase productUseCase;
     private final InventoryUseCase inventoryUseCase;
+    private final OrderMetrics orderMetrics;
 
     @Override
     @Transactional
     public UUID createOrder(Order order) {
-        log.info("Placing new order for customer: {}", order.getCustomerId());
+        // Measured around the whole use case: validation, pricing, stock and persistence.
+        Timer.Sample sample = orderMetrics.startCreateTimer();
+        boolean success = false;
+        try {
+            log.info("Placing new order for customer: {}", order.getCustomerId());
 
-        // 1. Validate Customer existence
-        customerUseCase.getCustomerById(order.getCustomerId())
-                .orElseThrow(() -> new IllegalArgumentException("Customer not found: " + order.getCustomerId()));
+            // 1. Validate Customer existence
+            customerUseCase.getCustomerById(order.getCustomerId())
+                    .orElseThrow(() -> new IllegalArgumentException("Customer not found: " + order.getCustomerId()));
 
-        // 2. Fetch Product Prices and calculate total
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        for (OrderItem item : order.getItems()) {
-            Product product = productUseCase.getProductById(item.getProductId())
-                    .orElseThrow(() -> new IllegalArgumentException("Product not found: " + item.getProductId()));
+            // 2. Fetch Product Prices and calculate total
+            BigDecimal totalAmount = BigDecimal.ZERO;
+            for (OrderItem item : order.getItems()) {
+                Product product = productUseCase.getProductById(item.getProductId())
+                        .orElseThrow(() -> new IllegalArgumentException("Product not found: " + item.getProductId()));
             
-            item.setProductName(product.getName());
-            item.setPrice(product.getDiscountPrice() != null ? product.getDiscountPrice() : product.getBasePrice());
-            item.setCreatedAt(ZonedDateTime.now());
+                item.setProductName(product.getName());
+                item.setPrice(product.getDiscountPrice() != null ? product.getDiscountPrice() : product.getBasePrice());
+                item.setCreatedAt(ZonedDateTime.now());
             
-            totalAmount = totalAmount.add(item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+                totalAmount = totalAmount.add(item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
 
-            // 3. Deduct Stock from Inventory
-            inventoryUseCase.updateStock(item.getProductId(), -item.getQuantity());
+                // 3. Deduct Stock from Inventory
+                inventoryUseCase.updateStock(item.getProductId(), -item.getQuantity());
+            }
+
+            order.setTotalAmount(totalAmount);
+            order.setStatus(OrderStatus.PENDING);
+            order.setOrderNumber("ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+        
+            // 4. Snapshot the customer's default shipping address
+            String addressSnapshot = customerUseCase.getAddressesByCustomerId(order.getCustomerId()).stream()
+                    .filter(CustomerAddress::isDefault)
+                    .findFirst()
+                    .map(addr -> String.format("%s, %s, %s, %s, %s", 
+                            addr.getAddressLine1(), addr.getAddressLine2(), addr.getCity(), addr.getPostalCode(), addr.getCountry()))
+                    .orElseThrow(() -> new IllegalStateException("Customer has no default shipping address"));
+        
+            order.setShippingAddressSnapshot(addressSnapshot);
+            order.setCreatedAt(ZonedDateTime.now());
+            order.setUpdatedAt(ZonedDateTime.now());
+
+            // 5. Save Order
+            UUID orderId = orderRepositoryPort.save(order).getId();
+            // Only counts once the transaction commits, so a commit-time rollback is not counted.
+            orderMetrics.incrementPlaced();
+            success = true;
+            return orderId;
+        } finally {
+            // Failures are recorded too (with outcome=failure): a slow failure still shows up.
+            orderMetrics.stopCreateTimer(sample, success);
         }
-
-        order.setTotalAmount(totalAmount);
-        order.setStatus(OrderStatus.PENDING);
-        order.setOrderNumber("ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
-        
-        // 4. Snapshot the customer's default shipping address
-        String addressSnapshot = customerUseCase.getAddressesByCustomerId(order.getCustomerId()).stream()
-                .filter(CustomerAddress::isDefault)
-                .findFirst()
-                .map(addr -> String.format("%s, %s, %s, %s, %s", 
-                        addr.getAddressLine1(), addr.getAddressLine2(), addr.getCity(), addr.getPostalCode(), addr.getCountry()))
-                .orElseThrow(() -> new IllegalStateException("Customer has no default shipping address"));
-        
-        order.setShippingAddressSnapshot(addressSnapshot);
-        order.setCreatedAt(ZonedDateTime.now());
-        order.setUpdatedAt(ZonedDateTime.now());
-
-        // 5. Save Order
-        return orderRepositoryPort.save(order).getId();
     }
 
     @Override
